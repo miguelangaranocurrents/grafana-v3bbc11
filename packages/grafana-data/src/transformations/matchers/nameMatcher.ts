@@ -116,7 +116,13 @@ function fieldNameFallback(fields: Set<string>) {
     };
   } else if (fields.has('Time') || fields.has('time')) {
     fallback = (field: Field, frame: DataFrame) => {
-      return frame.meta?.typeVersion == null && field.type === FieldType.time;
+      // Only the frame's primary time field: a frame can carry several time fields and naming one 'time'
+      // must not match the others.
+      return (
+        frame.meta?.typeVersion == null &&
+        field.type === FieldType.time &&
+        frame.fields.find((f) => f.type === FieldType.time) === field
+      );
     };
   }
 

@@ -152,10 +152,12 @@ function reduceSeriesToRows(
       }
     }
 
-    // For reduced fields, we don't know the type until we see the value
+    // For reduced fields, we don't know the type until we see the value. A text source column yields
+    // string reductions (e.g. lastNotNull) in the same calc column as numeric ones, so a numeric value
+    // anywhere in the column must win over whichever value happens to come first.
     for (const f of fields) {
       if (f.type === FieldType.other) {
-        const t = guessFieldTypeForField(f);
+        const t = f.values.some((v) => typeof v === 'number') ? FieldType.number : guessFieldTypeForField(f);
         if (t) {
           f.type = t;
         }

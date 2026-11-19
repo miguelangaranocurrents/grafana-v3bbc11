@@ -10,7 +10,7 @@ import {
   resolveFacetedFilterNames,
 } from '@grafana/data';
 import { t } from '@grafana/i18n';
-import { type VizLegendOptions, AxisPlacement } from '@grafana/schema';
+import { type VizLegendOptions, AxisPlacement, LegendDisplayMode } from '@grafana/schema';
 
 import { SeriesVisibilityChangeMode } from '../../components/PanelChrome/types';
 import { useStyles2, useTheme2 } from '../../themes/ThemeContext';
@@ -207,6 +207,12 @@ export const PlotLegend = memo(function PlotLegend({
       overflow={vizLayoutLegendProps.overflow}
     />
   );
+
+  // A hidden legend must not render a VizLayout legend at all: VizLayout only sizes the plot once the
+  // legend has a measured height, so an empty legend element leaves the plot unrendered.
+  if (displayMode === LegendDisplayMode.Hidden) {
+    return null;
+  }
 
   if (facetedFilterPinned && facetedFilter) {
     return (
